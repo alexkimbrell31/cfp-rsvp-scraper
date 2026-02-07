@@ -1,4 +1,12 @@
 {
+  "name": "cfp-rsvp-scraper",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "scrape": "node cfp-rsvp-html/scripts/getRSVPPrice.js",
+    "scrape:title": "node cfp-rsvp-html/scripts/scrapeWebsite.js",
+    "start-scheduler": "node cfp-rsvp-html/scripts/scheduleScraper.js"
+  },
   "devDependencies": {
     "@types/node": "^25.1.0"
   },
