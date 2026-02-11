@@ -84,7 +84,7 @@ node cfp-rsvp-html/scripts/scrapeWebsite.js https://example.com
 2. **Phase 3 - Alerts**: Configure thresholds (>20%, >30% drops), rolling averages, cooldown debouncing
 3. **Phase 4 - Notifications**: Email (Gmail SMTP) + Discord webhook (free options)
 
-See [PROJECT_BREAKDOWN.md](cfp-rsvp-html/gameplan/PROJECT_BREAKDOWN.md) for detailed task lists per phase.
+See [PROJECT_BREAKDOWN.md](../gameplan/PROJECT_BREAKDOWN.md) for detailed task lists per phase.
 
 ## Common Gotchas
 

@@ -195,25 +195,62 @@ A real-time monitoring system for College Football Playoff (CFP) RSVP marketplac
 
 ### 9. **Backend (Node.js + SQLite)**
 **Goal:** Central server to persist team option prices, serve APIs to UI/mobile, and manage which teams are tracked
+**Goal:** Central server to persist team option prices, provide a GraphQL API to web & mobile clients, and manage which teams are tracked.
 
-**Tasks:**
-- [ ] Scaffold a Node.js backend (ESM) with an Express or Fastify HTTP API
-- [ ] Add SQLite database integration (better-sqlite3 or sqlite3) and initialize schema
-- [ ] Design schema to store teams and recent option prices. Example table `teams`:
-  - `id` INTEGER PRIMARY KEY
-  - `name` TEXT NOT NULL
-  - `price_100` REAL
-  - `price_300` REAL
-  - `active` INTEGER DEFAULT 1  # 1 = active (track), 0 = inactive
-  - `last_updated` TEXT (ISO timestamp)
-- [ ] Add endpoints:
-  - `GET /teams` — list teams and current prices
-  - `POST /teams` — add a team
-  - `PATCH /teams/:id` — update team (toggle `active`, update prices)
-  - `GET /teams/:id/history` — historical prices
-  - `POST /scrape` — trigger a scrape (internal/webhook)
-- [ ] Implement server-side validation and error handling
-- [ ] Add lightweight authentication (API token) for UI/mobile access (optional)
+**Language & API:**
+- Backend implemented in **TypeScript** (recommended Node 18+ ESM).
+- Use GraphQL (Apollo Server, GraphQL Yoga, or similar) for all client-server communication (queries + mutations + subscriptions for live alerts).
+- Expose a small REST health/admin surface (`/health`, `/metrics`) and an authenticated GraphQL endpoint for app access.
+
+**Database & Schema:**
+- Use SQLite (better-sqlite3) for phase 1 with a clear migration/init script.
+- Recommended tables:
+  - `teams`:
+    - `id` INTEGER PRIMARY KEY
+    - `name` TEXT NOT NULL UNIQUE
+    - `active` INTEGER DEFAULT 1
+    - `last_updated` TEXT (ISO timestamp)
+  - `prices` (history / snapshots):
+    - `id` INTEGER PRIMARY KEY
+    - `team_id` INTEGER NOT NULL REFERENCES teams(id)
+    - `level` TEXT CHECK(level IN ('100','300')) NOT NULL
+    - `rank` INTEGER NOT NULL  -- 1..6 (cheapest ranks)
+    - `price` REAL NOT NULL
+    - `timestamp` TEXT NOT NULL
+  - `users` (preferences):
+    - `id` INTEGER PRIMARY KEY
+    - `username` TEXT UNIQUE
+    - `email` TEXT
+    - `prefs` JSON  -- store tracked team ids, thresholds, channels, etc.
+
+**How current snapshot is stored:** store each scrape as up to 12 `prices` rows per team (6 ranks for 100, 6 ranks for 300). The latest `prices` rows by `timestamp` represent the current snapshot.
+
+**Scale & retention guidance:**
+- Expected raw volume (example): 140 teams * 12 prices = 1,680 price rows per scrape. At 500 scrapes/day → ~840k new `prices` rows/day. For 180 days this is ~151M rows.
+- SQLite can handle moderate volumes but this growth suggests adding retention/aggregation: keep full detail for N days (e.g., 7–30), aggregate hourly/daily summaries afterwards, or migrate to PostgreSQL if long-term storage of raw rows is required.
+
+**API surface (GraphQL):**
+- Queries: `teams`, `team(id)`, `prices(teamId, level, since)`, `me` (user prefs)
+- Mutations: `addTeam`, `updateTeam(active/price)`, `setUserPrefs`, `triggerScrape` (internal)
+- Subscriptions (optional): `priceDrop(teamId, threshold)` for live alerts
+
+**Auth / Security:**
+- Simple API token auth (header-based `Authorization: Bearer <TOKEN>`) for apps; store tokens in `users` or a `tokens` table.
+- Keep secrets in `.env`; provide `.env.example`.
+
+**Deployment / Ops:**
+- Docker-ready `Dockerfile` is recommended but optional for local dev — you can run the TypeScript server directly on your mac mini.
+- Provide `docker-compose` example if you later add services (Redis, Postgres).
+- Add `/health` endpoint for process manager (PM2) or Docker health checks.
+
+**Deliverables:**
+- A `server/` directory (TypeScript) with `src/`, `tsconfig.json`, `package.json`, migrations/init SQL, and a GraphQL schema.
+- A `server/README.md` with quickstart, `.env.example`, and dev scripts (`dev`, `build`, `start`).
+
+**Notes / next decisions:**
+- Decide retention policy for `prices` (full history window) and whether to aggregate older data.
+- Choose GraphQL server library (Apollo vs Yoga) and whether subscriptions are required now.
+- Plan backups for the SQLite file (periodic copy to another host or cloud storage).
 
 **Deliverables:**
 - A `server/` directory with API routes, SQLite setup, and DB migration/init script
@@ -227,7 +264,7 @@ A real-time monitoring system for College Football Playoff (CFP) RSVP marketplac
 **Tasks:**
 - [ ] Scaffold a React + TypeScript frontend (Vite or Create React App with TS)
 - [ ] Implement pages/components: Dashboard (price charts), Team details, Alerts, Settings
-- [ ] Connect to backend via a simple REST API or WebSocket for live updates
+ - [ ] Connect to backend via a GraphQL API for queries, mutations and subscriptions (live updates)
 - [ ] Implement authentication (optional: token-based for personal use)
 - [ ] Add UI tests and accessibility checks
 
@@ -246,6 +283,9 @@ A real-time monitoring system for College Football Playoff (CFP) RSVP marketplac
 - [ ] Implement local caching and offline view for recent data
 - [ ] Add deep-links to purchase pages or open web view for marketplace
 - [ ] Prepare App Store metadata and provisioning (if publishing)
+
+**Integration:**
+- The iOS app will communicate with the server over GraphQL (same schema as the web app). Use Apollo iOS or other GraphQL client libraries to access queries, mutations and subscriptions for live alerts.
 
 **Deliverables:**
 - An `ios/` directory with Xcode project or a README linking to iOS app sources
@@ -279,10 +319,13 @@ cfp-rsvp-scraper/
 ├── cfp-rsvp-html/
 │   ├── teampage*.html            # Team pages
 │   └── accountpage.html
-├── server/                        # Node.js backend (API + SQLite)
-│   ├── index.js                   # Server entry (Express/Fastify)
-│   ├── db.js                      # SQLite connection + migrations
-│   └── routes/                    # API route handlers
+├── server/                        # Node.js backend (TypeScript + GraphQL + SQLite)
+│   ├── src/
+│   │   ├── index.ts               # Server entry (GraphQL + Express/Fastify)
+│   │   ├── db.ts                  # SQLite connection + migrations
+│   │   └── schema/                # GraphQL schema + resolvers
+│   ├── tsconfig.json
+│   └── package.json
 ├── frontend/                      # React + TypeScript web app
 │   └── (Vite or CRA TypeScript)
 ├── ios/                           # iOS app (Swift/SwiftUI) or docs
@@ -331,7 +374,7 @@ cfp-rsvp-scraper/
 | Config | dotenv | Standard practice |
 | Frontend | React + TypeScript (Vite/CRA) | Fast dev feedback, typed UI code |
 | Mobile | iOS (Swift + SwiftUI) | Native push notifications and best UX on iPhone |
-| Backend | Node.js + SQLite | Lightweight server + embedded DB for persistence |
+| Backend | Node.js + TypeScript + GraphQL + SQLite | Lightweight server + typed code + GraphQL API |
 
 ---
 
