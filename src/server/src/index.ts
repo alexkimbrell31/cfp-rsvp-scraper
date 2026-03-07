@@ -1,11 +1,19 @@
 import express from 'express';
 import { initializeDatabase, getDatabase } from './db/db_init_script.js';
+import { addMockData } from './db/db_add_2025_mock_data.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Initialize DB on startup
 initializeDatabase();
+
+// Optionally add mock data (comment out if not needed)
+const ADD_MOCK_DATA = process.env.ADD_MOCK_DATA === 'true';
+if (ADD_MOCK_DATA) {
+  console.log('⚙️  Environment variable ADD_MOCK_DATA=true detected. Loading mock data...\n');
+  addMockData();
+}
 
 // Middleware
 app.use(express.json());

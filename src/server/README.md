@@ -29,6 +29,11 @@ cp .env.example .env
 npm run dev
 ```
 
+**Development with mock data (2025 CFP data):**
+```bash
+ADD_MOCK_DATA=true npm run dev
+```
+
 **Production build:**
 ```bash
 npm run build
@@ -54,6 +59,20 @@ Returns all current prices for active teams.
 ## Database
 
 The server uses SQLite with the following schema:
+
+### Mock Data
+
+The `db_add_2025_mock_data.ts` script contains historical price data from the 2025 CFP campaign. It includes:
+- 17 teams (Ohio State, Miami, Oregon, Georgia, Texas A&M, etc.)
+- 7 price snapshots from October 4 to January 5
+- ~150 price records tracking price changes over time
+
+**To load mock data on startup:**
+```bash
+ADD_MOCK_DATA=true npm run dev
+```
+
+This is useful for testing the API endpoint without needing live scraper data.
 
 ### Tables
 
