@@ -24,3 +24,15 @@ export const getSingleTeamPricesQuery = `
     WHERE t.active = 1 AND t.id = ?
     ORDER BY p.timestamp DESC
 `;
+
+export const setTeamActiveStatusQuery = `
+    UPDATE teams
+    SET active = ?
+    WHERE id = ?
+`;
+
+export const getAllTeamsQuery = `
+    SELECT id, name, active
+    FROM teams
+    ORDER BY name
+`;

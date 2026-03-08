@@ -9,3 +9,4 @@ List of features that I think have potential value:
 8. Reference Sportsbooks to calculate the "best value" RSVPs.
 9. Reference Sportsbooks to calculate RSVPs as under/over valued (will need to keep fan bases in mind - ex: texas).
 10. List of the "most financially gifted" fanbases (reference ticket prices for team's games over the past 5 years - highest average ticket price for ranked games or 5 biggest matchups).
+11. Analytics tab on website that goes over all the top teams. Could have advanced analytics for things like "third and short conversion percentage", "run success rate on obivous running downs", "pass success rate on third and long", etc.
