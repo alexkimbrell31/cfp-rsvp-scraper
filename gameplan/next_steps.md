@@ -15,3 +15,18 @@
 3/7/2026:
 * look into the index.ts file in the 'server' folder and start to reorganize it a bit. I'd like to separate out the endpoints and the queries into different folders
 * try to create a new endpoint (ex: get all price history for a specific team).
+
+
+3/7/2026:
+* add endpoints to get/set team as 'active' (tracking prices is turned ON) for a specific team
+* add endpoint to get all teams and corresponding teamId (need this to call teamId specific endpoints)
+* Start on React side and call one of the endpoint from the frontend
+* trigger team specific endpoints based on button presses on main page
+
+
+future:
+* research potential graph packages to display prices on frontend
+* research how to pull betting odds off of FanDuel/ESPN/Ceasar's
+* display graph for team data on frontend
+* display list of teams and their betting odds to make playoff and NC
+* add endpoint to immediately scrape data from cfp-rsvp.com (get latest data on command)

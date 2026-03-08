@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = path.join(__dirname, '../cfp-rsvp.db');
 
-export function initializeDatabase() {
+export function initializeDatabase(): Database.Database {
   const db = new Database(dbPath);
   db.pragma('journal_mode = WAL');
 
@@ -34,6 +34,6 @@ export function initializeDatabase() {
   return db;
 }
 
-export function getDatabase() {
+export function getDatabase(): Database.Database {
   return new Database(dbPath);
 }
