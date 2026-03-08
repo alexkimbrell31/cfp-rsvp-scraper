@@ -10,3 +10,8 @@
 * Add more backend endpoints for retrieving all team data (look at /server README.md for examples)
 * Read in SQLite data on frontend and display
 * Export SQLite data to excel/sheets and play around with charts (what makes sense vs what doesn't)
+
+
+3/7/2026:
+* look into the index.ts file in the 'server' folder and start to reorganize it a bit. I'd like to separate out the endpoints and the queries into different folders
+* try to create a new endpoint (ex: get all price history for a specific team).
