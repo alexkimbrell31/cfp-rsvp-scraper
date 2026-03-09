@@ -20,8 +20,16 @@
 3/7/2026:
 * add endpoints to get/set team as 'active' (tracking prices is turned ON) for a specific team
 * add endpoint to get all teams and corresponding teamId (need this to call teamId specific endpoints)
-* Start on React side and call one of the endpoints from the frontend      // LEFT OFF HERE!!
+
+
+3/8/2026:
+* Start on React side and call one of the endpoints from the frontend
 * trigger team specific endpoints based on button presses on main page
+
+
+3/8/2026:
+* Update LandingPage to display the team links in sets of rows and columns
+* Update TeamPage to display the prices and timestamps in a list
 
 
 future:
